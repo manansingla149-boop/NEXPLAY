@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXPLAY | Discover Your Next Game</title>
-    <meta name="description" content="Discover games, explore new worlds, and find your next gaming obsession with NEXPLAY.">
+
+    <title>NEXPLAY | Your Gaming Universe</title>
+    <meta name="description" content="Discover your next favourite game with NEXPLAY. Explore games across multiple genres.">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-
     <header class="navbar">
-        <a href="#" class="logo">NEX<span>PLAY</span></a>
+        <a href="/" class="logo">NEX<span>PLAY</span></a>
 
-        <nav>
+        <nav class="nav-links">
             <a href="#home">Home</a>
-            <a href="#games">Games</a>
+            <a href="#games">Explore Games</a>
             <a href="#about">About</a>
         </nav>
 
-        <a href="#games" class="nav-button">Explore Games</a>
+        <a href="#games" class="nav-button">Explore Now ↗</a>
     </header>
 
     <main>
@@ -32,39 +34,37 @@
                 </h1>
 
                 <p class="hero-description">
-                    Discover incredible games, explore new worlds,
-                    and find your next gaming obsession.
+                    Discover legendary adventures, competitive battles,
+                    and unforgettable worlds. Find your next favourite game.
                 </p>
 
-                <div class="hero-buttons">
-                    <a href="#games" class="primary-button">
-                        Explore Games →
-                    </a>
-                    <a href="#about" class="secondary-button">
-                        About Us
-                    </a>
+                <div class="hero-actions">
+                    <a href="#games" class="primary-button">Explore Games →</a>
+                    <a href="#about" class="secondary-button">Discover NEXPLAY</a>
                 </div>
 
                 <div class="hero-stats">
                     <div>
-                        <strong>04</strong>
-                        <span>Featured Games</span>
+                        <strong>{{ games|length }}+</strong>
+                        <span>Games to explore</span>
                     </div>
                     <div>
-                        <strong>∞</strong>
-                        <span>Possibilities</span>
+                        <strong>{{ categories|length }}</strong>
+                        <span>Game categories</span>
                     </div>
                 </div>
             </div>
 
-            <div class="hero-art">
-                <div class="orb orb-one"></div>
-                <div class="orb orb-two"></div>
-                <div class="hero-card">
-                    <span class="hero-card-icon">🎮</span>
-                    <p>READY PLAYER ONE?</p>
-                    <h2>Your world.<br>Your rules.</h2>
-                    <span class="live-dot">DISCOVER SOMETHING NEW</span>
+            <div class="hero-visual">
+                <div class="hero-orbit orbit-one"></div>
+                <div class="hero-orbit orbit-two"></div>
+
+                <div class="hero-game-card">
+                    <span class="floating-label">✦ YOUR NEXT QUEST</span>
+                    <div class="hero-symbol">N</div>
+                    <h2>READY PLAYER?</h2>
+                    <p>Your next favourite game is waiting.</p>
+                    <a href="#games">Find your game ↗</a>
                 </div>
             </div>
         </section>
@@ -72,74 +72,120 @@
         <section class="games-section" id="games">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">FIND YOUR NEXT FAVOURITE</p>
-                    <h2>Explore <span>Games.</span></h2>
+                    <p class="eyebrow">THE COLLECTION</p>
+                    <h2>Explore the <span>Games.</span></h2>
+                    <p class="section-description">
+                        From massive open worlds to competitive shooters,
+                        there's something for every player.
+                    </p>
                 </div>
 
+                <span class="game-count">{{ games|length }} GAMES</span>
+            </div>
+
+            <div class="game-controls">
                 <div class="search-box">
                     <span>⌕</span>
                     <input
-                        type="text"
+                        type="search"
                         id="gameSearch"
                         placeholder="Search games..."
                         aria-label="Search games"
                     >
                 </div>
+
+                <select id="sortGames" aria-label="Sort games">
+                    <option value="default">Featured</option>
+                    <option value="az">Name: A to Z</option>
+                    <option value="za">Name: Z to A</option>
+                </select>
             </div>
 
-            <div class="game-grid" id="gameGrid">
+            <div class="category-filters" id="categoryFilters">
+                <button class="filter-button active" data-category="all">
+                    All Games
+                </button>
+
+                {% for category in categories %}
+                <button class="filter-button" data-category="{{ category }}">
+                    {{ category }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="games-grid" id="gamesGrid">
                 {% for game in games %}
-                <article class="game-card">
-                    <div class="game-image">
-                        <img
-                            src="{{ game.image }}"
-                            alt="{{ game.name }}"
-                            loading="lazy"
-                        >
-                        <span class="game-category">
-                            {{ game.category }}
-                        </span>
-                    </div>
+                <article
+                    class="game-card"
+                    data-name="{{ game.name|lower }}"
+                    data-category="{{ game.category }}"
+                >
+                    <a
+                        class="game-image-link"
+                        href="{{ url_for('game_detail', slug=game.slug) }}"
+                        aria-label="View {{ game.name }} details"
+                    >
+                        <div class="game-image-wrap">
+                            <img
+                                src="{{ game.image }}"
+                                alt="{{ game.name }} cover"
+                                class="game-image"
+                                loading="lazy"
+                            >
+                            <span class="game-category">{{ game.category }}</span>
+                        </div>
+                    </a>
 
                     <div class="game-info">
                         <h3>{{ game.name }}</h3>
                         <p>{{ game.description }}</p>
-                        <a
-                            class="game-link"
-                            href="https://www.google.com/search?q={{ game.name | urlencode }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Discover Game ↗
-                        </a>
+
+                        <div class="game-card-footer">
+                            <a
+                                class="details-link"
+                                href="{{ url_for('game_detail', slug=game.slug) }}"
+                            >
+                                View Details ↗
+                            </a>
+
+                            <button
+                                class="favorite-button"
+                                type="button"
+                                data-favorite="{{ game.slug }}"
+                                aria-label="Add {{ game.name }} to favourites"
+                                aria-pressed="false"
+                                title="Add to favourites"
+                            >♡</button>
+                        </div>
                     </div>
                 </article>
                 {% endfor %}
             </div>
 
-            <p id="noResults" class="no-results" hidden>
-                No games found. Try another search!
-            </p>
+            <div class="no-results" id="noResults" hidden>
+                <h3>No games found</h3>
+                <p>Try another search or choose a different category.</p>
+            </div>
         </section>
 
         <section class="about-section" id="about">
-            <p class="eyebrow">MORE THAN JUST PLAYING</p>
-            <h2>Made for the <span>Players.</span></h2>
+            <p class="eyebrow">BUILT FOR PLAYERS</p>
+            <h2>Find your next <span>obsession.</span></h2>
             <p>
-                NEXPLAY is a gaming discovery website built for people
-                who love exploring new games and finding their next adventure.
-                Your next favourite game could be one click away.
+                NEXPLAY is your gaming discovery hub.
+                Browse different genres, explore game details,
+                and keep track of your favourites.
             </p>
-            <a href="#games" class="primary-button">Find Your Next Game →</a>
+            <a href="#games" class="primary-button">Browse the collection →</a>
         </section>
     </main>
 
     <footer class="footer">
-        <a href="#home" class="logo">NEX<span>PLAY</span></a>
-        <p>Built for gamers. Powered by curiosity.</p>
-        <p class="copyright">© 2026 NEXPLAY. All rights reserved.</p>
+        <a href="/" class="logo">NEX<span>PLAY</span></a>
+        <p>Discover. Play. Repeat.</p>
+        <p class="footer-small">© 2026 NEXPLAY. Made for gamers.</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </body>
 </html>
