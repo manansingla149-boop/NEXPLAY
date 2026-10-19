@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Player Profile | NEXPLAY</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .profile-page {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 24px;
+        }
+
+        .profile-card {
+            padding: 30px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+
+        .profile-avatar {
+            font-size: 64px;
+            margin: 20px 0;
+        }
+
+        .profile-form {
+            display: grid;
+            gap: 18px;
+            max-width: 500px;
+        }
+
+        .profile-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+        }
+
+        .profile-form input,
+        .profile-form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface-light);
+            color: var(--text);
+        }
+
+        .profile-message {
+            color: var(--muted);
+            margin-top: 16px;
+        }
+        .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+}
+
+.profile-stat-card {
+    padding: 20px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.profile-stat-icon {
+    font-size: 28px;
+}
+
+.profile-stat-card h3 {
+    margin: 12px 0 6px;
+}
+
+.profile-stat-card p {
+    margin: 0;
+    color: var(--nexplay-accent);
+    font-weight: bold;
+}
+
+.profile-section-title {
+    margin-top: 30px;
+}
+
+.profile-favourites {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.profile-favourite-item {
+    padding: 15px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.profile-favourite-item a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.profile-favourite-item a:hover {
+    color: var(--nexplay-accent);
+}
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="/" class="logo">NEX<span>PLAY</span></a>
+
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/#games">Explore Games</a>
+        </nav>
+
+        <a href="/" class="nav-button">Back to Home ↗</a>
+    </header>
+
+    <main class="profile-page">
+        <section class="profile-card">
+            <p class="eyebrow">YOUR GAMING IDENTITY</p>
+            <h1>Player Profile</h1>
+
+            <div class="profile-avatar" id="profile-avatar">🎮</div>
+
+            <h2 id="profile-display-name">Player</h2>
+            <p class="profile-message">
+                Create your own identity in the NEXPLAY universe.
+            </p>
+
+            <form class="profile-form" id="profile-form">
+                <div>
+                    <label for="profile-username">Player username</label>
+                    <input
+                        type="text"
+                        id="profile-username"
+                        maxlength="20"
+                        placeholder="Enter your username"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="profile-avatar-choice">Choose your avatar</label>
+                    <select id="profile-avatar-choice">
+                        <option value="🎮">🎮 Gamer</option>
+                        <option value="👑">👑 Champion</option>
+                        <option value="🐉">🐉 Dragon</option>
+                        <option value="👾">👾 Pixel Player</option>
+                        <option value="🚀">🚀 Explorer</option>
+                        <option value="⚡">⚡ Speedster</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    Save Profile
+                </button>
+            </form>
+<div class="profile-stats">
+    <div class="profile-stat-card">
+        <span class="profile-stat-icon">🎮</span>
+        <h3>Games Saved</h3>
+        <p id="profile-favourite-count">0</p>
+    </div>
+
+    <div class="profile-stat-card">
+        <span class="profile-stat-icon">🏆</span>
+        <h3>Player Rank</h3>
+        <p id="profile-rank">Rookie</p>
+    </div>
+</div>
+
+<h2 class="profile-section-title">❤️ My Favourite Games</h2>
+<div id="profile-favourites" class="profile-favourites">
+    <p>Your favourite games will appear here.</p>
+</div>
+            <p class="profile-message" id="profile-message"
+               aria-live="polite">
+                Your profile will be saved in this browser.
+            </p>
+        </section>
+    </main>
+
+    <script>
+        const profileForm = document.getElementById("profile-form");
+        const usernameInput = document.getElementById("profile-username");
+        const avatarChoice = document.getElementById("profile-avatar-choice");
+        const displayName = document.getElementById("profile-display-name");
+        const avatarDisplay = document.getElementById("profile-avatar");
+        const profileMessage = document.getElementById("profile-message");
+
+        function loadProfile() {
+            try {
+                const saved = localStorage.getItem("nexplay-player-profile");
+
+                if (!saved) return;
+
+                const profile = JSON.parse(saved);
+
+                usernameInput.value = profile.username || "";
+                avatarChoice.value = profile.avatar || "🎮";
+                displayName.textContent = profile.username || "Player";
+                avatarDisplay.textContent = profile.avatar || "🎮";
+            } catch (error) {
+                profileMessage.textContent =
+                    "Could not load the saved profile.";
+            }
+        }
+
+        profileForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = usernameInput.value.trim();
+
+            if (!username) {
+                profileMessage.textContent =
+                    "Please enter a username first.";
+                return;
+            }
+
+            const profile = {
+                username: username,
+                avatar: avatarChoice.value
+            };
+
+            try {
+                localStorage.setItem(
+                    "nexplay-player-profile",
+                    JSON.stringify(profile)
+                );
+
+                displayName.textContent = username;
+                avatarDisplay.textContent = avatarChoice.value;
+                profileMessage.textContent = "Profile saved successfully!";
+            } catch (error) {
+                profileMessage.textContent =
+                    "The browser could not save your profile.";
+            }
+        });
+
+function loadFavouriteGames() {
+    const favouritesContainer =
+        document.getElementById("profile-favourites");
+
+    const countElement =
+        document.getElementById("profile-favourite-count");
+
+    const rankElement =
+        document.getElementById("profile-rank");
+
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem("nexplay-favourites") || "[]"
+        );
+
+        const favourites = Array.isArray(saved) ? saved : [];
+
+        countElement.textContent = favourites.length;
+
+        if (favourites.length >= 10) {
+            rankElement.textContent = "Legend";
+        } else if (favourites.length >= 5) {
+            rankElement.textContent = "Veteran";
+        } else if (favourites.length >= 1) {
+            rankElement.textContent = "Gamer";
+        } else {
+            rankElement.textContent = "Rookie";
+        }
+
+        favouritesContainer.replaceChildren();
+
+        if (favourites.length === 0) {
+            const message = document.createElement("p");
+            message.textContent =
+                "No favourite games yet. Visit the homepage and tap a heart to save a game.";
+            favouritesContainer.appendChild(message);
+            return;
+        }
+
+        favourites.forEach(function (slug) {
+            const item = document.createElement("div");
+            item.className = "profile-favourite-item";
+
+            const link = document.createElement("a");
+            link.href = "/game/" + encodeURIComponent(slug);
+            link.textContent = slug
+                .replaceAll("-", " ")
+                .replace(/\b\w/g, letter => letter.toUpperCase());
+
+            item.appendChild(link);
+            favouritesContainer.appendChild(item);
+        });
+    } catch (error) {
+        countElement.textContent = "—";
+        rankElement.textContent = "—";
+        favouritesContainer.textContent =
+            "Could not load your favourite games.";
+    }
+}
+
+loadFavouriteGames();
+        loadProfile();
+    </script>
+</body>
+</html>
